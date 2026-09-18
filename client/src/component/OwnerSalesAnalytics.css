@@ -1,0 +1,787 @@
+
+/* =========================================================
+   OWNER SALES PAGE
+   ========================================================= */
+
+.owner-sales-page {
+  padding: 30px;
+  background: #eae2d6;
+  min-height: 100vh;
+
+  animation: ownerSalesPageIn 0.7s ease both;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.owner-sales-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+
+  animation: ownerSalesHeaderIn 0.7s ease 0.1s both;
+}
+
+.owner-sales-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #667085;
+  margin-bottom: 7px;
+}
+
+.owner-sales-header h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #172033;
+  letter-spacing: -0.4px;
+}
+
+.owner-sales-header p {
+  margin: 8px 0 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.owner-sales-header-badge {
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e9f0;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.owner-sales-header-badge:hover {
+  transform: translateY(-3px);
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.1);
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+   ========================================================= */
+
+.owner-sales-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.owner-sales-summary-card {
+  background: #ffffff;
+  border: 1px solid #e8ecf2;
+  border-radius: 16px;
+  padding: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.04);
+
+  opacity: 0;
+  animation: salesCardIn 0.6s ease forwards;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Stagger animation */
+
+.owner-sales-summary-card:nth-child(1) {
+  animation-delay: 0.15s;
+}
+
+.owner-sales-summary-card:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.owner-sales-summary-card:nth-child(3) {
+  animation-delay: 0.35s;
+}
+
+.owner-sales-summary-card:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.owner-sales-summary-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 16px 32px rgba(16, 24, 40, 0.12);
+  border-color: #d7dee8;
+}
+
+
+/* =========================================================
+   SUMMARY ICON
+   ========================================================= */
+
+.owner-sales-summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  flex-shrink: 0;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.owner-sales-summary-card:hover
+.owner-sales-summary-icon {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.1);
+}
+
+.owner-sales-summary-card span {
+  display: block;
+  color: #667085;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.owner-sales-summary-card strong {
+  display: block;
+  color: #172033;
+  font-size: 22px;
+  font-weight: 700;
+
+  transition: transform 0.25s ease;
+}
+
+.owner-sales-summary-card:hover strong {
+  transform: translateX(3px);
+}
+
+
+/* =========================================================
+   MONTH SALES CARD
+   ========================================================= */
+
+.owner-sales-month-card {
+  background: #ffffff;
+  border: 1px solid #e8ecf2;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.04);
+
+  animation: salesMonthIn 0.7s ease 0.5s both;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.owner-sales-month-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 35px rgba(16, 24, 40, 0.12);
+}
+
+.owner-sales-month-card span {
+  font-size: 12px;
+  color: #667085;
+  font-weight: 600;
+}
+
+.owner-sales-month-card h3 {
+  margin: 6px 0;
+  color: #172033;
+  font-size: 27px;
+
+  transition: transform 0.3s ease;
+}
+
+.owner-sales-month-card:hover h3 {
+  transform: translateX(4px);
+}
+
+.owner-sales-month-card p {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.owner-sales-month-icon {
+  font-size: 38px;
+  width: 62px;
+  height: 62px;
+  border-radius: 16px;
+  background: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.3s ease;
+}
+
+.owner-sales-month-card:hover
+.owner-sales-month-icon {
+  transform: scale(1.08) rotate(5deg);
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.1);
+}
+
+
+/* =========================================================
+   CONTENT GRID
+   ========================================================= */
+
+.owner-sales-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.owner-sales-panel {
+  background: #ffffff;
+  border: 1px solid #e8ecf2;
+  border-radius: 16px;
+  padding: 22px;
+
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.04);
+
+  animation: panelIn 0.7s ease both;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.owner-sales-panel:nth-child(1) {
+  animation-delay: 0.65s;
+}
+
+.owner-sales-panel:nth-child(2) {
+  animation-delay: 0.75s;
+}
+
+.owner-sales-panel:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 38px rgba(16, 24, 40, 0.1);
+  border-color: #d8e0ea;
+}
+
+
+/* =========================================================
+   PANEL HEADER
+   ========================================================= */
+
+.owner-sales-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  padding-bottom: 17px;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.owner-sales-panel-header span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #98a2b3;
+}
+
+.owner-sales-panel-header h3 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  color: #172033;
+}
+
+.owner-sales-panel-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: #f1f4f8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.owner-sales-panel:hover
+.owner-sales-panel-icon {
+  transform: rotate(8deg) scale(1.08);
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.1);
+}
+
+
+/* =========================================================
+   PRODUCTS
+   ========================================================= */
+
+.owner-sales-products {
+  margin-top: 8px;
+}
+
+.owner-sales-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f2f5;
+
+  animation: rowSlideIn 0.5s ease both;
+
+  transition:
+    padding-left 0.25s ease,
+    background 0.25s ease;
+}
+
+.owner-sales-product:hover {
+  padding-left: 7px;
+}
+
+.owner-sales-product:last-child {
+  border-bottom: none;
+}
+
+.owner-sales-product-rank {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: hsl(214, 33%, 96%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #475467;
+  font-size: 11px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.owner-sales-product:hover
+.owner-sales-product-rank {
+  transform: scale(1.12);
+  box-shadow: 0 6px 14px rgba(16, 24, 40, 0.1);
+}
+
+.owner-sales-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.owner-sales-product-info strong {
+  display: block;
+  color: #344054;
+  font-size: 14px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owner-sales-product-info span {
+  display: block;
+  margin-top: 3px;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.owner-sales-product-revenue {
+  font-size: 13px;
+  font-weight: 700;
+  color: #172033;
+  white-space: nowrap;
+
+  transition: transform 0.25s ease;
+}
+
+.owner-sales-product:hover
+.owner-sales-product-revenue {
+  transform: translateX(-3px);
+}
+
+
+/* =========================================================
+   PAYMENT LIST
+   ========================================================= */
+
+.owner-sales-payment-list {
+  margin-top: 8px;
+}
+
+.owner-sales-payment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f2f5;
+
+  transition:
+    padding-left 0.25s ease,
+    padding-right 0.25s ease;
+}
+
+.owner-sales-payment:hover {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.owner-sales-payment:last-child {
+  border-bottom: none;
+}
+
+.owner-sales-payment div strong {
+  display: block;
+  color: #344054;
+  font-size: 14px;
+}
+
+.owner-sales-payment div span {
+  display: block;
+  margin-top: 3px;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.owner-sales-payment > strong {
+  color: #172033;
+  font-size: 14px;
+
+  transition: transform 0.25s ease;
+}
+
+.owner-sales-payment:hover > strong {
+  transform: scale(1.04);
+}
+
+
+/* =========================================================
+   RECENT SALES
+   ========================================================= */
+
+.owner-sales-recent-panel {
+  margin-bottom: 10px;
+}
+
+.owner-sales-recent-list {
+  margin-top: 8px;
+}
+
+.owner-sales-recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  padding: 15px 0;
+  border-bottom: 1px solid #eef0f3;
+
+  transition:
+    padding-left 0.25s ease,
+    padding-right 0.25s ease;
+}
+
+.owner-sales-recent-item:hover {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.owner-sales-recent-item:last-child {
+  border-bottom: none;
+}
+
+.owner-sales-recent-item div strong {
+  display: block;
+  color: #344054;
+  font-size: 14px;
+}
+
+.owner-sales-recent-item div span {
+  display: block;
+  margin-top: 3px;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.owner-sales-recent-item > strong {
+  color: #172033;
+  font-size: 14px;
+
+  transition: transform 0.25s ease;
+}
+
+.owner-sales-recent-item:hover > strong {
+  transform: translateX(-3px);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.owner-sales-empty {
+  text-align: center;
+  padding: 35px 10px 20px;
+  color: #98a2b3;
+
+  animation: emptyStateIn 0.6s ease both;
+}
+
+.owner-sales-empty div {
+  font-size: 28px;
+  margin-bottom: 8px;
+
+  animation: emptyIconFloat 2.5s ease-in-out infinite;
+}
+
+.owner-sales-empty p {
+  margin: 0;
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes ownerSalesPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ownerSalesHeaderIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes salesCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes salesMonthIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rowSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes emptyStateIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes emptyIconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .owner-sales-page,
+  .owner-sales-header,
+  .owner-sales-summary-card,
+  .owner-sales-month-card,
+  .owner-sales-panel,
+  .owner-sales-product,
+  .owner-sales-empty {
+    animation: none;
+    opacity: 1;
+  }
+
+  .owner-sales-summary-card,
+  .owner-sales-month-card,
+  .owner-sales-panel,
+  .owner-sales-header-badge,
+  .owner-sales-summary-icon,
+  .owner-sales-month-icon,
+  .owner-sales-panel-icon,
+  .owner-sales-product-rank {
+    transition: none;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 992px) {
+  .owner-sales-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .owner-sales-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 576px) {
+  .owner-sales-page {
+    padding: 18px;
+  }
+
+  .owner-sales-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .owner-sales-header h2 {
+    font-size: 24px;
+  }
+
+  .owner-sales-header-badge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .owner-sales-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-sales-summary-card {
+    padding: 17px;
+  }
+
+  .owner-sales-month-card {
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .owner-sales-month-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 26px;
+  }
+
+  .owner-sales-month-card h3 {
+    font-size: 23px;
+  }
+
+  .owner-sales-panel {
+    padding: 18px;
+  }
+
+  .owner-sales-product,
+  .owner-sales-payment,
+  .owner-sales-recent-item {
+    gap: 10px;
+  }
+}
+
