@@ -56,6 +56,149 @@ body {
   text-align: center;
 }
 
+
+
+/* =========================
+   SMARTMED HERO ANIMATED BACKGROUND
+========================= */
+
+.hero-background {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-background::before,
+.hero-background::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(2px);
+}
+
+.hero-background::before {
+  width: 320px;
+  height: 320px;
+  top: -120px;
+  left: -100px;
+  background: rgba(13, 110, 253, 0.08);
+  animation: smartmedGlow 8s ease-in-out infinite;
+}
+
+.hero-background::after {
+  width: 380px;
+  height: 380px;
+  right: -140px;
+  bottom: -180px;
+  background: rgba(25, 135, 84, 0.07);
+  animation: smartmedGlow 10s ease-in-out infinite reverse;
+}
+
+@keyframes smartmedGlow {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(35px, -25px) scale(1.08);
+  }
+}
+
+/* Floating medical and delivery objects */
+
+.smartmed-floating-object {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  z-index: -1;
+  opacity: 0.60;
+  animation: smartmedFloat 7s ease-in-out infinite;
+}
+
+.smartmed-float-1 {
+  top: 12%;
+  left: 7%;
+  font-size: 38px;
+  animation-delay: 0s;
+}
+
+.smartmed-float-2 {
+  top: 25%;
+  right: 8%;
+  font-size: 42px;
+  animation-delay: 1.5s;
+}
+
+.smartmed-float-3 {
+  top: 58%;
+  left: 12%;
+  font-size: 34px;
+  animation-delay: 2.5s;
+}
+
+.smartmed-float-4 {
+  top: 65%;
+  right: 14%;
+  font-size: 36px;
+  animation-delay: 3.5s;
+}
+
+.smartmed-float-5 {
+  top: 38%;
+  left: 3%;
+  font-size: 30px;
+  animation-delay: 4s;
+}
+
+.smartmed-float-6 {
+  top: 48%;
+  right: 4%;
+  font-size: 32px;
+  animation-delay: 5s;
+}
+
+.smartmed-float-7 {
+  top: 78%;
+  left: 25%;
+  font-size: 28px;
+  animation-delay: 1s;
+}
+
+.smartmed-float-8 {
+  top: 80%;
+  right: 28%;
+  font-size: 30px;
+  animation-delay: 2s;
+}
+
+@keyframes smartmedFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate3d(10px, -14px, 0) rotate(4deg);
+  }
+
+  50% {
+    transform: translate3d(-8px, -25px, 0) rotate(-3deg);
+  }
+
+  75% {
+    transform: translate3d(12px, -10px, 0) rotate(3deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .smartmed-floating-object {
+    opacity: 0.1;
+  }
+}
+
 /* =========================
    SEARCH BOX
 ========================= */

@@ -24,6 +24,7 @@ const everydayWellnessCategories = [
 ];
 
 function OwnerInventory({
+  
   medicines = [],
   wellnessProducts = [],
   onUpdateStock,
@@ -32,6 +33,7 @@ function OwnerInventory({
   onEditMedicine,
   onDeleteMedicine,
 }) {
+   console.log("OWNER INVENTORY MEDICINES:", medicines);
   const [search, setSearch] = useState("");
   const [stockFilter, setStockFilter] = useState("all");
   const [expiryFilter, setExpiryFilter] = useState("all");
@@ -97,15 +99,15 @@ function OwnerInventory({
       stock === 0 ? "Out of Stock" : stock <= 10 ? "Low Stock" : "Available";
 
     const medicine = {
-  id: Date.now(),
-  name,
-  categoryType: newMedicine.categoryType,
-  category,
-  price,
-  stock,
-  status,
+      id: Date.now(),
+      name,
+      categoryType: newMedicine.categoryType,
+      category,
+      price,
+      stock,
+      status,
 
-  strength: newMedicine.strength.trim(),
+      strength: newMedicine.strength.trim(),
       packSize: newMedicine.packSize.trim(),
       manufacturer: newMedicine.manufacturer.trim(),
       manufacturingDate: newMedicine.manufacturingDate,
@@ -134,65 +136,62 @@ function OwnerInventory({
     setShowAddMedicine(false);
   };
 
- const getExpiryStatus = (expiryDate) => {
-  if (!expiryDate) {
-    return "not-set";
-  }
-
-  let expiryDateObject;
-
-  // Handle YYYY-MM format
-  if (
-    typeof expiryDate === "string" &&
-    /^\d{4}-\d{2}$/.test(expiryDate)
-  ) {
-    const [year, month] = expiryDate.split("-").map(Number);
-
-    if (!year || !month) {
+  const getExpiryStatus = (expiryDate) => {
+    if (!expiryDate) {
       return "not-set";
     }
 
-    expiryDateObject = new Date(year, month - 1, 1);
-  } else {
-    // Handle MongoDB / ISO date
-    expiryDateObject = new Date(expiryDate);
+    let expiryDateObject;
 
-    if (Number.isNaN(expiryDateObject.getTime())) {
-      return "not-set";
+    // Handle YYYY-MM format
+    if (typeof expiryDate === "string" && /^\d{4}-\d{2}$/.test(expiryDate)) {
+      const [year, month] = expiryDate.split("-").map(Number);
+
+      if (!year || !month) {
+        return "not-set";
+      }
+
+      expiryDateObject = new Date(year, month - 1, 1);
+    } else {
+      // Handle MongoDB / ISO date
+      expiryDateObject = new Date(expiryDate);
+
+      if (Number.isNaN(expiryDateObject.getTime())) {
+        return "not-set";
+      }
+
+      // Compare by month, not exact day
+      expiryDateObject = new Date(
+        expiryDateObject.getFullYear(),
+        expiryDateObject.getMonth(),
+        1,
+      );
     }
 
-    // Compare by month, not exact day
-    expiryDateObject = new Date(
-      expiryDateObject.getFullYear(),
-      expiryDateObject.getMonth(),
+    const currentDate = new Date();
+
+    const currentMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
       1,
     );
-  }
 
-  const currentDate = new Date();
+    if (expiryDateObject < currentMonth) {
+      return "expired";
+    }
 
-  const currentMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1,
-  );
+    const threeMonthsLater = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 3,
+      1,
+    );
 
-  if (expiryDateObject < currentMonth) {
-    return "expired";
-  }
+    if (expiryDateObject <= threeMonthsLater) {
+      return "expiring-soon";
+    }
 
-  const threeMonthsLater = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 3,
-    1,
-  );
-
-  if (expiryDateObject <= threeMonthsLater) {
-    return "expiring-soon";
-  }
-
-  return "valid";
-};
+    return "valid";
+  };
 
   const formatExpiryDate = (expiryDate) => {
     if (!expiryDate) {
@@ -212,96 +211,87 @@ function OwnerInventory({
   };
 
  const allInventoryItems = [
-  ...medicines
-    .filter(
-      (medicine) => medicine.categoryType !== "Everyday Wellness",
-    )
-    .map((medicine) => ({
-      ...medicine,
-      productType: "medicine",
-      backendId: medicine.backendId || medicine._id,
-    })),
-
-  ...medicines
-    .filter(
-      (medicine) => medicine.categoryType === "Everyday Wellness",
-    )
-    .map((medicine) => ({
-      ...medicine,
-      productType: "wellness",
-      backendId: medicine.backendId || medicine._id,
-    })),
-
-  ...wellnessProducts.map((product) => ({
-    ...product,
-    productType: "wellness",
-    backendId: product.backendId || product._id,
+  ...medicines.map((medicine) => ({
+    ...medicine,
+    productType:
+      medicine.categoryType === "Everyday Wellness"
+        ? "wellness"
+        : "medicine",
+    backendId: medicine.backendId || medicine._id,
   })),
+
+  ...wellnessProducts
+    .filter(
+      (product) =>
+        !medicines.some(
+          (medicine) =>
+            medicine.id === product.id ||
+            medicine.frontendId === product.id ||
+            medicine.name?.trim().toLowerCase() ===
+              product.name?.trim().toLowerCase(),
+        ),
+    )
+    .map((product) => ({
+      ...product,
+      productType: "wellness",
+      backendId: product.backendId || product._id,
+    })),
 ];
-console.log("OWNER INVENTORY MEDICINES:", medicines);
-console.log("OWNER INVENTORY WELLNESS:", wellnessProducts);
+    
+  const filteredMedicines = allInventoryItems.filter((medicine) => {
+    const searchTerm = search.trim().toLowerCase();
 
-const filteredMedicines = allInventoryItems.filter((medicine) => {
-  const searchTerm = search.trim().toLowerCase();
+    const matchesSearch =
+      searchTerm === "" ||
+      medicine.name.toLowerCase().includes(searchTerm) ||
+      medicine.category?.toLowerCase().includes(searchTerm);
 
-  const matchesSearch =
-    searchTerm === "" ||
-    medicine.name.toLowerCase().includes(searchTerm) ||
-    medicine.category?.toLowerCase().includes(searchTerm);
+    const currentStock = Number(medicine.stock || 0);
 
-  const currentStock = Number(medicine.stock || 0);
+    const currentStockStatus =
+      currentStock === 0
+        ? "Out of Stock"
+        : currentStock <= 10
+          ? "Low Stock"
+          : "Available";
 
-  const currentStockStatus =
-    currentStock === 0
-      ? "Out of Stock"
-      : currentStock <= 10
-        ? "Low Stock"
-        : "Available";
+    const matchesFilter =
+      stockFilter === "all" || currentStockStatus === stockFilter;
 
-  const matchesFilter =
-    stockFilter === "all" || currentStockStatus === stockFilter;
+    const medicineExpiryStatus = getExpiryStatus(medicine.expiryDate);
 
-  const medicineExpiryStatus = getExpiryStatus(medicine.expiryDate);
+    const matchesProductType =
+      productTypeFilter === "all" || medicine.productType === productTypeFilter;
 
-  const matchesProductType =
-    productTypeFilter === "all" ||
-    medicine.productType === productTypeFilter;
+    const matchesExpiry =
+      expiryFilter === "all" ||
+      (expiryFilter === "expired" && medicineExpiryStatus === "expired") ||
+      (expiryFilter === "expiring-soon" &&
+        medicineExpiryStatus === "expiring-soon") ||
+      (expiryFilter === "valid" && medicineExpiryStatus === "valid") ||
+      (expiryFilter === "not-set" && medicineExpiryStatus === "not-set");
 
-  const matchesExpiry =
-    expiryFilter === "all" ||
-    (expiryFilter === "expired" &&
-      medicineExpiryStatus === "expired") ||
-    (expiryFilter === "expiring-soon" &&
-      medicineExpiryStatus === "expiring-soon") ||
-    (expiryFilter === "valid" &&
-      medicineExpiryStatus === "valid") ||
-    (expiryFilter === "not-set" &&
-      medicineExpiryStatus === "not-set");
+    return (
+      matchesSearch && matchesFilter && matchesExpiry && matchesProductType
+    );
+  });
 
-  return (
-    matchesSearch &&
-    matchesFilter &&
-    matchesExpiry &&
-    matchesProductType
+  const actualMedicines = medicines.filter(
+    (medicine) => medicine.categoryType !== "Everyday Wellness",
   );
-});
 
- const actualMedicines = medicines.filter(
-  (medicine) => medicine.categoryType !== "Everyday Wellness",
-);
+  const availableCount = actualMedicines.filter(
+    (medicine) => Number(medicine.stock || 0) > 10,
+  ).length;
 
-const availableCount = actualMedicines.filter(
-  (medicine) => Number(medicine.stock || 0) > 10,
-).length;
+  const lowStockCount = actualMedicines.filter(
+    (medicine) =>
+      Number(medicine.stock || 0) >= 1 && Number(medicine.stock || 0) <= 10,
+  ).length;
 
-const lowStockCount = actualMedicines.filter(
-  (medicine) => Number(medicine.stock || 0) >= 1 &&
-    Number(medicine.stock || 0) <= 10,
-).length;
-
-const outOfStockCount = actualMedicines.filter(
-  (medicine) => Number(medicine.stock || 0) === 0,
-).length;
+  const outOfStockCount = actualMedicines.filter(
+    (medicine) => Number(medicine.stock || 0) === 0,
+  ).length;
   const expiredCount = medicines.filter(
     (medicine) => getExpiryStatus(medicine.expiryDate) === "expired",
   ).length;
@@ -315,12 +305,10 @@ const outOfStockCount = actualMedicines.filter(
     0,
   );
 
-const stockPercentage =
-  actualMedicines.length > 0
-    ? Math.round(
-        (availableCount / actualMedicines.length) * 100,
-      )
-    : 0;
+  const stockPercentage =
+    actualMedicines.length > 0
+      ? Math.round((availableCount / actualMedicines.length) * 100)
+      : 0;
 
   // ================= EXPIRY ALERTS =================
 
@@ -501,8 +489,6 @@ const stockPercentage =
                   required
                 />
               </div>
-
-              
 
               <div>
                 <label>Category Type</label>
@@ -837,8 +823,6 @@ const stockPercentage =
                   />
                 </div>
 
-                 
-
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Manufacturing Date</label>
                   <input
@@ -947,7 +931,7 @@ const stockPercentage =
             <div className="inventory-analytics-icon">💊</div>
             <div>
               <span>Medicine Types</span>
-             <strong>{actualMedicines.length}</strong>
+              <strong>{actualMedicines.length}</strong>
             </div>
           </div>
 
@@ -1145,10 +1129,10 @@ const stockPercentage =
       ) : (
         <div className="owner-inventory-list">
           {filteredMedicines.map((medicine) => (
-           <div
-  className="owner-inventory-card"
-  key={`${medicine.productType}-${medicine.id}`}
->
+            <div
+              className="owner-inventory-card"
+              key={`${medicine.productType}-${medicine.id}`}
+            >
               {/* Medicine Information */}
               <div className="inventory-medicine-info">
                 <div className="inventory-medicine-icon">💊</div>

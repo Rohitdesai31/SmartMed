@@ -258,11 +258,58 @@ function App() {
       return;
     }
 
+    const backendWellnessProducts = backendMedicines
+      .filter((medicine) => medicine.categoryType === "Everyday Wellness")
+      .map((medicine) => ({
+        ...medicine,
+        id: medicine.frontendId || medicine._id,
+        frontendId: medicine.frontendId,
+        backendId: medicine._id,
+        productType: "wellness",
+        wellnessCategory: medicine.healthCategory || medicine.category || "",
+      }));
+
+    if (backendWellnessProducts.length === 0) {
+      return;
+    }
+
+    setInventoryWellnessProducts((currentProducts) => {
+      const backendIds = new Set(
+        backendWellnessProducts.map((product) => product.backendId),
+      );
+
+      const frontendOnlyProducts = currentProducts.filter(
+        (product) => !product.backendId || !backendIds.has(product.backendId),
+      );
+
+      return [
+        ...backendWellnessProducts,
+        ...frontendOnlyProducts.filter(
+          (product) =>
+            !backendWellnessProducts.some(
+              (backendProduct) =>
+                backendProduct.id === product.id ||
+                backendProduct.name?.trim().toLowerCase() ===
+                  product.name?.trim().toLowerCase(),
+            ),
+        ),
+      ];
+    });
+  }, [backendMedicines]);
+
+  useEffect(() => {
+    if (backendMedicines.length === 0) {
+      return;
+    }
+
     setInventoryMedicines((currentMedicines) => {
       // Update medicines that already exist in frontend inventory
       const updatedMedicines = currentMedicines.map((medicine) => {
         const backendMedicine = backendMedicines.find(
-          (item) => item.frontendId === medicine.id,
+          (item) =>
+            item.frontendId === medicine.id ||
+            item.name?.trim().toLowerCase() ===
+              medicine.name?.trim().toLowerCase(),
         );
 
         if (!backendMedicine) {
@@ -561,36 +608,7 @@ function App() {
     console.log("Product Backend ID:", product.backendId);
     const productType = isWellnessProduct ? "wellness" : "medicine";
 
-    // Wellness products continue using the existing frontend cart
-    if (productType === "wellness") {
-      const existingProduct = cart.find(
-        (item) => item.id === product.id && item.productType === productType,
-      );
-
-      if (existingProduct) {
-        setCart(
-          cart.map((item) =>
-            item.id === product.id && item.productType === productType
-              ? {
-                  ...item,
-                  quantity: item.quantity + 1,
-                }
-              : item,
-          ),
-        );
-      } else {
-        setCart([
-          ...cart,
-          {
-            ...product,
-            productType: productType,
-            quantity: 1,
-          },
-        ]);
-      }
-
-      return;
-    }
+    // Wellness and Medicine products → Backend Cart
 
     // Medicine → Backend Cart
     try {
@@ -626,13 +644,13 @@ function App() {
 
       // Keep existing frontend cart UI working for now
       const existingProduct = cart.find(
-        (item) => item.id === product.id && item.productType === "medicine",
+        (item) => item.id === product.id && item.productType === productType,
       );
 
       if (existingProduct) {
         setCart(
           cart.map((item) =>
-            item.id === product.id && item.productType === "medicine"
+            item.id === product.id && item.productType === productType
               ? {
                   ...item,
                   quantity: item.quantity + 1,
@@ -645,7 +663,7 @@ function App() {
           ...cart,
           {
             ...product,
-            productType: "medicine",
+            productType: productType,
             quantity: 1,
           },
         ]);
@@ -2588,53 +2606,58 @@ function App() {
 
                             <div className="d-flex justify-content-center gap-4 mt-3 mb-2">
                               <button
-  type="button"
-  className="btn btn-link p-0 text-decoration-none"
-  onClick={async () => {
-    const name = prompt("Enter your registered owner name:");
+                                type="button"
+                                className="btn btn-link p-0 text-decoration-none"
+                                onClick={async () => {
+                                  const name = prompt(
+                                    "Enter your registered owner name:",
+                                  );
 
-    if (!name || !name.trim()) {
-      return;
-    }
+                                  if (!name || !name.trim()) {
+                                    return;
+                                  }
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/auth/forgot-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-          }),
-        },
-      );
+                                  try {
+                                    const response = await fetch(
+                                      `${API_BASE_URL}/auth/forgot-email`,
+                                      {
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                          name: name.trim(),
+                                        }),
+                                      },
+                                    );
 
-      const data = await response.json();
+                                    const data = await response.json();
 
-      if (!response.ok) {
-        alert(
-          data.message ||
-            "Unable to find your login email.",
-        );
-        return;
-      }
+                                    if (!response.ok) {
+                                      alert(
+                                        data.message ||
+                                          "Unable to find your login email.",
+                                      );
+                                      return;
+                                    }
 
-      alert(
-        `Your SmartMed owner login email is:\n\n${data.email}`,
-      );
-    } catch (error) {
-      console.error("Forgot Login Email Error:", error);
+                                    alert(
+                                      `Your SmartMed owner login email is:\n\n${data.email}`,
+                                    );
+                                  } catch (error) {
+                                    console.error(
+                                      "Forgot Login Email Error:",
+                                      error,
+                                    );
 
-      alert(
-        "Cannot connect to SmartMed server. Please make sure the backend is running.",
-      );
-    }
-  }}
->
-  Forgot Login Email?
-</button>
+                                    alert(
+                                      "Cannot connect to SmartMed server. Please make sure the backend is running.",
+                                    );
+                                  }
+                                }}
+                              >
+                                Forgot Login Email?
+                              </button>
 
                               <button
                                 type="button"
@@ -2656,270 +2679,276 @@ function App() {
 
                         {/* ================= OWNER FORGOT PASSWORD ================= */}
 
-{loginRole === "owner" && showForgotPassword && (
-  <div className="mt-3">
-    <div className="text-center mb-4">
-      <div className="login-icon">🔐</div>
+                        {loginRole === "owner" && showForgotPassword && (
+                          <div className="mt-3">
+                            <div className="text-center mb-4">
+                              <div className="login-icon">🔐</div>
 
-      <h2>
-        {forgotPasswordStep === 1
-          ? "Forgot Password"
-          : "Reset Password"}
-      </h2>
+                              <h2>
+                                {forgotPasswordStep === 1
+                                  ? "Forgot Password"
+                                  : "Reset Password"}
+                              </h2>
 
-      <p className="text-muted">
-        {forgotPasswordStep === 1
-          ? "Enter your registered owner email"
-          : "Enter the OTP and create your new password"}
-      </p>
-    </div>
+                              <p className="text-muted">
+                                {forgotPasswordStep === 1
+                                  ? "Enter your registered owner email"
+                                  : "Enter the OTP and create your new password"}
+                              </p>
+                            </div>
 
-    {/* ================= STEP 1 ================= */}
+                            {/* ================= STEP 1 ================= */}
 
-    {forgotPasswordStep === 1 && (
-      <>
-        <div className="mb-3">
-          <label className="form-label">Owner Email</label>
+                            {forgotPasswordStep === 1 && (
+                              <>
+                                <div className="mb-3">
+                                  <label className="form-label">
+                                    Owner Email
+                                  </label>
 
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Enter your registered email"
-            value={forgotPasswordEmail}
-            onChange={(e) =>
-              setForgotPasswordEmail(e.target.value)
-            }
-          />
-        </div>
+                                  <input
+                                    type="email"
+                                    className="form-control"
+                                    placeholder="Enter your registered email"
+                                    value={forgotPasswordEmail}
+                                    onChange={(e) =>
+                                      setForgotPasswordEmail(e.target.value)
+                                    }
+                                  />
+                                </div>
 
-        <button
-          type="button"
-          className="btn btn-primary w-100"
-          disabled={forgotPasswordLoading}
-          onClick={async () => {
-            const email = forgotPasswordEmail
-              .trim()
-              .toLowerCase();
+                                <button
+                                  type="button"
+                                  className="btn btn-primary w-100"
+                                  disabled={forgotPasswordLoading}
+                                  onClick={async () => {
+                                    const email = forgotPasswordEmail
+                                      .trim()
+                                      .toLowerCase();
 
-            if (!email) {
-              alert("Please enter your owner email.");
-              return;
-            }
+                                    if (!email) {
+                                      alert("Please enter your owner email.");
+                                      return;
+                                    }
 
-            setForgotPasswordLoading(true);
+                                    setForgotPasswordLoading(true);
 
-            try {
-              const response = await fetch(
-                `${API_BASE_URL}/auth/forgot-password`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    email,
-                  }),
-                },
-              );
+                                    try {
+                                      const response = await fetch(
+                                        `${API_BASE_URL}/auth/forgot-password`,
+                                        {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          },
+                                          body: JSON.stringify({
+                                            email,
+                                          }),
+                                        },
+                                      );
 
-              const data = await response.json();
+                                      const data = await response.json();
 
-              if (!response.ok) {
-                alert(
-                  data.message ||
-                    "Unable to generate password reset OTP.",
-                );
-                return;
-              }
+                                      if (!response.ok) {
+                                        alert(
+                                          data.message ||
+                                            "Unable to generate password reset OTP.",
+                                        );
+                                        return;
+                                      }
 
-              /*
-               * Development/testing:
-               * Backend currently returns the OTP.
-               */
-              if (data.otp) {
-                alert(`Your password reset OTP is: ${data.otp}`);
-              } else {
-                alert(
-                  "If this email is registered, an OTP has been generated.",
-                );
-              }
+                                      /*
+                                       * Development/testing:
+                                       * Backend currently returns the OTP.
+                                       */
+                                      if (data.otp) {
+                                        alert(
+                                          `Your password reset OTP is: ${data.otp}`,
+                                        );
+                                      } else {
+                                        alert(
+                                          "If this email is registered, an OTP has been generated.",
+                                        );
+                                      }
 
-              setForgotPasswordEmail(email);
-              setForgotPasswordStep(2);
-            } catch (error) {
-              console.error(
-                "Forgot Password Error:",
-                error,
-              );
+                                      setForgotPasswordEmail(email);
+                                      setForgotPasswordStep(2);
+                                    } catch (error) {
+                                      console.error(
+                                        "Forgot Password Error:",
+                                        error,
+                                      );
 
-              alert(
-                "Cannot connect to SmartMed server. Please make sure the backend is running.",
-              );
-            } finally {
-              setForgotPasswordLoading(false);
-            }
-          }}
-        >
-          {forgotPasswordLoading
-            ? "Sending OTP..."
-            : "📩 Send OTP"}
-        </button>
-      </>
-    )}
+                                      alert(
+                                        "Cannot connect to SmartMed server. Please make sure the backend is running.",
+                                      );
+                                    } finally {
+                                      setForgotPasswordLoading(false);
+                                    }
+                                  }}
+                                >
+                                  {forgotPasswordLoading
+                                    ? "Sending OTP..."
+                                    : "📩 Send OTP"}
+                                </button>
+                              </>
+                            )}
 
-    {/* ================= STEP 2 ================= */}
+                            {/* ================= STEP 2 ================= */}
 
-    {forgotPasswordStep === 2 && (
-      <>
-        <div className="mb-3">
-          <label className="form-label">OTP</label>
+                            {forgotPasswordStep === 2 && (
+                              <>
+                                <div className="mb-3">
+                                  <label className="form-label">OTP</label>
 
-          <input
-            type="text"
-            className="form-control text-center"
-            placeholder="Enter 6-digit OTP"
-            maxLength="6"
-            value={forgotPasswordOtp}
-            onChange={(e) =>
-              setForgotPasswordOtp(
-                e.target.value.replace(/\D/g, ""),
-              )
-            }
-          />
-        </div>
+                                  <input
+                                    type="text"
+                                    className="form-control text-center"
+                                    placeholder="Enter 6-digit OTP"
+                                    maxLength="6"
+                                    value={forgotPasswordOtp}
+                                    onChange={(e) =>
+                                      setForgotPasswordOtp(
+                                        e.target.value.replace(/\D/g, ""),
+                                      )
+                                    }
+                                  />
+                                </div>
 
-        <div className="mb-3">
-          <label className="form-label">New Password</label>
+                                <div className="mb-3">
+                                  <label className="form-label">
+                                    New Password
+                                  </label>
 
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={(e) =>
-              setNewPassword(e.target.value)
-            }
-          />
-        </div>
+                                  <input
+                                    type="password"
+                                    className="form-control"
+                                    placeholder="Enter new password"
+                                    value={newPassword}
+                                    onChange={(e) =>
+                                      setNewPassword(e.target.value)
+                                    }
+                                  />
+                                </div>
 
-        <div className="mb-3">
-          <label className="form-label">
-            Confirm New Password
-          </label>
+                                <div className="mb-3">
+                                  <label className="form-label">
+                                    Confirm New Password
+                                  </label>
 
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) =>
-              setConfirmPassword(e.target.value)
-            }
-          />
-        </div>
+                                  <input
+                                    type="password"
+                                    className="form-control"
+                                    placeholder="Confirm new password"
+                                    value={confirmPassword}
+                                    onChange={(e) =>
+                                      setConfirmPassword(e.target.value)
+                                    }
+                                  />
+                                </div>
 
-        <button
-          type="button"
-          className="btn btn-primary w-100"
-          disabled={forgotPasswordLoading}
-          onClick={async () => {
-            if (forgotPasswordOtp.length !== 6) {
-              alert("Please enter the 6-digit OTP.");
-              return;
-            }
+                                <button
+                                  type="button"
+                                  className="btn btn-primary w-100"
+                                  disabled={forgotPasswordLoading}
+                                  onClick={async () => {
+                                    if (forgotPasswordOtp.length !== 6) {
+                                      alert("Please enter the 6-digit OTP.");
+                                      return;
+                                    }
 
-            if (newPassword.length < 6) {
-              alert(
-                "New password must be at least 6 characters.",
-              );
-              return;
-            }
+                                    if (newPassword.length < 6) {
+                                      alert(
+                                        "New password must be at least 6 characters.",
+                                      );
+                                      return;
+                                    }
 
-            if (newPassword !== confirmPassword) {
-              alert("Passwords do not match.");
-              return;
-            }
+                                    if (newPassword !== confirmPassword) {
+                                      alert("Passwords do not match.");
+                                      return;
+                                    }
 
-            setForgotPasswordLoading(true);
+                                    setForgotPasswordLoading(true);
 
-            try {
-              const response = await fetch(
-                `${API_BASE_URL}/auth/reset-password`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    email: forgotPasswordEmail,
-                    otp: forgotPasswordOtp,
-                    newPassword,
-                  }),
-                },
-              );
+                                    try {
+                                      const response = await fetch(
+                                        `${API_BASE_URL}/auth/reset-password`,
+                                        {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          },
+                                          body: JSON.stringify({
+                                            email: forgotPasswordEmail,
+                                            otp: forgotPasswordOtp,
+                                            newPassword,
+                                          }),
+                                        },
+                                      );
 
-              const data = await response.json();
+                                      const data = await response.json();
 
-              if (!response.ok) {
-                alert(
-                  data.message ||
-                    "Unable to reset password.",
-                );
-                return;
-              }
+                                      if (!response.ok) {
+                                        alert(
+                                          data.message ||
+                                            "Unable to reset password.",
+                                        );
+                                        return;
+                                      }
 
-              alert(
-                "Password reset successfully. You can now login with your new password.",
-              );
+                                      alert(
+                                        "Password reset successfully. You can now login with your new password.",
+                                      );
 
-              setShowForgotPassword(false);
-              setForgotPasswordStep(1);
-              setForgotPasswordEmail("");
-              setForgotPasswordOtp("");
-              setNewPassword("");
-              setConfirmPassword("");
+                                      setShowForgotPassword(false);
+                                      setForgotPasswordStep(1);
+                                      setForgotPasswordEmail("");
+                                      setForgotPasswordOtp("");
+                                      setNewPassword("");
+                                      setConfirmPassword("");
 
-              setOwnerLogin({
-                username: forgotPasswordEmail,
-                password: "",
-              });
-            } catch (error) {
-              console.error(
-                "Reset Password Error:",
-                error,
-              );
+                                      setOwnerLogin({
+                                        username: forgotPasswordEmail,
+                                        password: "",
+                                      });
+                                    } catch (error) {
+                                      console.error(
+                                        "Reset Password Error:",
+                                        error,
+                                      );
 
-              alert(
-                "Cannot connect to SmartMed server. Please make sure the backend is running.",
-              );
-            } finally {
-              setForgotPasswordLoading(false);
-            }
-          }}
-        >
-          {forgotPasswordLoading
-            ? "Resetting Password..."
-            : "🔑 Reset Password"}
-        </button>
-      </>
-    )}
+                                      alert(
+                                        "Cannot connect to SmartMed server. Please make sure the backend is running.",
+                                      );
+                                    } finally {
+                                      setForgotPasswordLoading(false);
+                                    }
+                                  }}
+                                >
+                                  {forgotPasswordLoading
+                                    ? "Resetting Password..."
+                                    : "🔑 Reset Password"}
+                                </button>
+                              </>
+                            )}
 
-    <button
-      type="button"
-      className="btn btn-light w-100 mt-2"
-      onClick={() => {
-        setShowForgotPassword(false);
-        setForgotPasswordStep(1);
-        setForgotPasswordEmail("");
-        setForgotPasswordOtp("");
-        setNewPassword("");
-        setConfirmPassword("");
-      }}
-    >
-      ← Back to Owner Login
-    </button>
-  </div>
-)}
+                            <button
+                              type="button"
+                              className="btn btn-light w-100 mt-2"
+                              onClick={() => {
+                                setShowForgotPassword(false);
+                                setForgotPasswordStep(1);
+                                setForgotPasswordEmail("");
+                                setForgotPasswordOtp("");
+                                setNewPassword("");
+                                setConfirmPassword("");
+                              }}
+                            >
+                              ← Back to Owner Login
+                            </button>
+                          </div>
+                        )}
 
                         {/* ================= USER LOGIN ================= */}
 
@@ -3141,9 +3170,34 @@ function App() {
               )}
 
               {/* ================= HERO SECTION ================= */}
-
+<div className="home-background">
               {isUser && !isOwner && (
-                <section className="container hero-section">
+               <section className="container hero-section">
+                  <div className="smartmed-floating-object smartmed-float-1">
+                    💊
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-2">
+                    📦
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-3">
+                    🧴
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-4">
+                    💊
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-5">
+                    🛒
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-6">
+                    📦
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-7">
+                    💊
+                  </div>
+                  <div className="smartmed-floating-object smartmed-float-8">
+                    🧴
+                  </div>
+
                   <div className="row">
                     <div className="col-12 text-center">
                       <h1 className="hero-title">
@@ -3348,6 +3402,7 @@ function App() {
                   </div>
                 </section>
               )}
+              </div>
 
               {isUser && !isOwner && (
                 <Categories
